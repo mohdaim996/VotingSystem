@@ -1,0 +1,25 @@
+﻿@model LoginViewModel
+
+<form asp-controller="Account" asp-action="Login" method="post">
+    @Html.ValidationSummary()
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <input asp-for="RememberMe" class="form-check-input" />
+            <label class="form-check-label" asp-for="RememberMe">Remember me</label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Log in</button>
+</form>

@@ -1,0 +1,111 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+
+}
+
+@model List<VoteViewModel>
+<div id="vote-area" class="text-center">
+	@foreach (var voteViewModel in Model)
+	{
+		<div id="@voteViewModel.Vote.Id" class="Vote visually-hidden d-flex flex-column align-items-start">
+			<h3>@voteViewModel.Vote.QuestionText</h3>
+			@foreach (var voteAnswer in voteViewModel.VoteAnswers)
+			{
+				<div>
+					<input id="answer @voteAnswer.Id" name="@voteViewModel.Vote.Id" type="radio" value="@voteAnswer.Id">
+					<label for="answer @voteAnswer.Id">@voteAnswer.OptionText</label>
+				</div>
+			}
+		</div>
+	}
+	<p id="error-message" class="text-danger visually-hidden">Please choose an answer!</p>
+	<div class="btn-group ">
+		<button id="back" class="btn btn-secondary">Back</button>
+		<button id="next" class="btn btn-primary">Next</button>
+	</div>
+
+</div>
+<div id="submit-area" class="visually-hidden text-center d-flex flex-column align-items-center gap-5">
+	<h1>Thank you for actively participating in the vote!</h1>
+
+	<p>Your input is valuable. You can proceed by clicking the 'Submit' button to save your votes and contribute to the decision-making process. If you wish to make any changes to your selections, simply click the 'Previous' button to review and modify your votes.</p>
+
+	<u>Your voice matters, and we appreciate your engagement in shaping the future!</u>
+
+	<div class="btn-group w-3" id="submit-area-inputs" style="height: 15%;">
+		<button id="previous" class="btn btn-secondary">Previous</button>
+		<button id="submit" class="btn btn-primary">Submit</button>
+	</div>
+
+</div>
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			const votes = {};
+			let activeQuestion = 1;
+			let vote = $('#' + activeQuestion.toString());
+			vote.removeClass('visually-hidden');
+
+
+			const next = $('#next');
+			next.click(function () {
+				let tmp = $(`input[name='${vote.attr('id')}']:checked`).val();
+				
+				if (!tmp) {
+					$("#error-message").removeClass('visually-hidden');
+					return;
+				}
+				$("#error-message").addClass('visually-hidden');
+				votes[vote.attr('id')] = tmp;
+				vote.addClass('visually-hidden');
+				console.log({ votes });
+				if (activeQuestion + 1 <= @Model.Count) {
+					activeQuestion++
+					vote = $('#' + activeQuestion.toString());
+					vote.removeClass('visually-hidden');
+
+				} else {
+					$('#vote-area').addClass('visually-hidden');
+					$('#submit-area').removeClass('visually-hidden');
+				}
+
+			});
+			const back = $('#back');
+			back.click(function () {
+				if (activeQuestion - 1 > 0) {
+					$("#error-message").addClass('visually-hidden');
+					vote.addClass('visually-hidden');
+					activeQuestion--
+					vote = $('#' + activeQuestion.toString());
+					vote.removeClass('visually-hidden');
+				}
+			});
+			const previous = $('#previous');
+			previous.click(function () {
+				$('#vote-area').removeClass('visually-hidden');
+				$('#submit-area').addClass('visually-hidden');
+				vote.removeClass('visually-hidden');
+			});
+			const submit = $('#submit');
+			submit.click(function () {
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("Votes", "Home")",
+					contentType: "application/json; charset=utf-8",
+					data: JSON.stringify(votes),
+					success: function (response) {
+						window.location.href = "@Url.Action("Results", "Home")";
+
+
+					},
+					error: function (error) {
+						console.error(error);
+					}
+				});
+			});
+
+		});
+
+	</script>
+}

@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<ul class="navbar-nav">
+    @if (!String.IsNullOrEmpty(HttpContextAccessor.HttpContext.Session.GetString("UserId")))
+    {
+        <li class="nav-item">
+            
+            <a href="/account/logout" class="nav-link text-dark">Logout</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark"  href="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark"  href="/Account/Login">Login</a>
+        </li>
+    }
+</ul>
